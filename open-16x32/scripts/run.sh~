@@ -1,0 +1,55 @@
+#!/bin/bash
+
+#PBS -q cuth
+#PBS -r n
+#PBS -l nodes=1,walltime=99:00:00
+#PBS -N periodic-8x16
+
+cd ${PBS_O_WORKDIR} # go to the directory where the job was submitted
+cd ..
+
+binary=../binaries/NOARCH.x
+
+#create a directory to store the inputs and the log for this run
+log_dir=all_runs/`date +%y_%m_%d_%T`
+mkdir -p $log_dir
+
+#make "latest" a link pointing to this dir
+rm -f latest
+ln -s $log_dir latest
+
+#redirect all output to the log file, which will appear in the run's directory
+exec > $log_dir/log.out 2>&1
+
+#if there's output from a run already in the work directory, copy do_arg.vml and evo_arg.vml into
+#scripts/ so that we can start from wherever we left off
+traj=`ls -rt ../work/evo_arg.*|tail -1|sed -e 's/.*arg\.//'`
+echo traj= $traj
+cp ../work/do_arg.$traj do_arg.vml
+cp ../work/evo_arg.$traj evo_arg.vml
+if [ ! -e ../work/force.dat.$traj ]; then
+  mv ../work/force.dat ../work/force.dat.$traj
+fi
+
+#copy the input vml files, the current C code, the Makefile, and the binary to the directory
+cp -pr ../vmls/ ../binaries/ $log_dir
+
+#construct the runjob command:
+cmd=$binary
+echo "runjob command:"
+echo "$cmd"
+
+#run the job:
+$cmd
+
+#copy any core dumps into the save directory for this run:
+mv ../work/core.* $log_dir
+
+JOB_NAME="CUTH DBW2"
+echo "Job died at $(date); cwd=`pwd`" | mail -s "${JOB_NAME} job died" gem2128@columbia.edu
+
+
+
+
+
+

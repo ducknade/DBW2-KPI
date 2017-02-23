@@ -1,0 +1,11 @@
+For 16^3, using
+
+wflow_trajs_per_measurement = 20
+wflow_dt = 0.05
+wflow_nsteps = 80
+wflow_measure_start_step = 0
+wflow_measure_interval = 1
+
+We expect t0 = 3.3(?), and this flows to t = 4.
+
+Using traj len = 2, step size = 2/20 = 0.1
