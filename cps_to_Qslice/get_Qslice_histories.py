@@ -5,6 +5,9 @@ import sys
 import time
 import math
 
+# argument format: --open/periodic #ens_name #therm_trajs
+# e.x., ./get_Qslices_history --open open-10x20 300
+
 assert len(sys.argv) == 4
 if sys.argv[1] == '--periodic': bc_open = False
 elif sys.argv[1] == '--open': bc_open = True
@@ -17,6 +20,10 @@ print "ens_name =", ens_name
 therm_trajs = int(sys.argv[3])
 
 print "Skipping first %d trajectories" % therm_trajs
+
+# Jiqun Tu
+if not os.path.exists('%s' % ens_name):
+    os.makedirs('%s' % ens_name)
 
 def read_results(filename):
   f = open(filename, 'r')
