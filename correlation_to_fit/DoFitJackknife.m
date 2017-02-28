@@ -54,35 +54,40 @@ function DoFitJackknife
 
 
   %%% Open ensembles %%%
-  guess_params = [18, repmat(0.115, 1, 8)];
-  Njack = 88;
-  [central_params, param_errors, chisq, chisq_error] = RunEnsemble('open-8x16', 16, 'open', Njack, guess_params);
-  WriteOpenResults('open-8x16', 16, central_params, param_errors, chisq, chisq_error);
+%  guess_params = [18, repmat(0.115, 1, 8)];
+%  Njack = 88;
+%  [central_params, param_errors, chisq, chisq_error] = RunEnsemble('open-8x16', 16, 'open', Njack, guess_params);
+%  WriteOpenResults('open-8x16', 16, central_params, param_errors, chisq, chisq_error);
 
   guess_params = [55, repmat(0.115, 1, 10)];
   Njack = 121;
   [central_params, param_errors, chisq, chisq_error] = RunEnsemble('open-10x20', 20, 'open', Njack, guess_params);
   WriteOpenResults('open-10x20', 20, central_params, param_errors, chisq, chisq_error);
 
-  guess_params = [200, repmat(0.115, 1, 12)];
-  Njack = 51;
-  [central_params, param_errors, chisq, chisq_error] = RunEnsemble('open-12x24', 24, 'open', Njack, guess_params);
-  WriteOpenResults('open-12x24', 24, central_params, param_errors, chisq, chisq_error);
-
-  guess_params = [550, repmat(0.115, 1, 14)];
-  Njack = 49;
-  [central_params, param_errors, chisq, chisq_error] = RunEnsemble('open-14x28', 28, 'open', Njack, guess_params);
-  WriteOpenResults('open-14x28', 28, central_params, param_errors, chisq, chisq_error);
-
-  guess_params = [2300, repmat(0.115, 1, 16)];
-  Njack = 22;
-  [central_params, param_errors, chisq, chisq_error] = RunEnsemble('open-16x32', 32, 'open', Njack, guess_params);
-  WriteOpenResults('open-16x32', 32, central_params, param_errors, chisq, chisq_error);
+%  guess_params = [200, repmat(0.115, 1, 12)];
+%  Njack = 51;
+%  [central_params, param_errors, chisq, chisq_error] = RunEnsemble('open-12x24', 24, 'open', Njack, guess_params);
+%  WriteOpenResults('open-12x24', 24, central_params, param_errors, chisq, chisq_error);
+%
+%  guess_params = [550, repmat(0.115, 1, 14)];
+%  Njack = 49;
+%  [central_params, param_errors, chisq, chisq_error] = RunEnsemble('open-14x28', 28, 'open', Njack, guess_params);
+%  WriteOpenResults('open-14x28', 28, central_params, param_errors, chisq, chisq_error);
+%
+%  guess_params = [2300, repmat(0.115, 1, 16)];
+%  Njack = 22;
+%  [central_params, param_errors, chisq, chisq_error] = RunEnsemble('open-16x32', 32, 'open', Njack, guess_params);
+%  WriteOpenResults('open-16x32', 32, central_params, param_errors, chisq, chisq_error);
 end
 
 
 function [central_params, param_errors, chisq, chisq_error] = RunEnsemble(ens_name, T, bc, Njack, guess_params)
   fprintf('Fitting ensemble %s; %s boundary conditions; %d jackknife blocks\n', ens_name, bc, Njack);
+
+% Jiqun Tu
+	mkdir('ACFs');
+	mkdir('results');
+	mkdir('shape');
 
   if strcmp(bc, 'open')
     model_residuals = @ComputeOpenModelResiduals;

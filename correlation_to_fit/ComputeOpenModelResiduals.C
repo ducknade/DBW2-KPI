@@ -147,7 +147,7 @@ std::vector<double> driver(const char* ens_name, int T, int jackknife_num, doubl
   if(strcmp(ens_name, last_ens_name) != 0 || last_jack_block != jackknife_num) {
     //mexPrintf("Need to load correlations for ensemble %s jackknife block %d\n", ens_name, jackknife_num);
     char true_corr_file_format[256];
-    sprintf(true_corr_file_format, "/home/gregm/DBW2/analysis/heat/fitting/correlations/%s/correlations_jackknife%d_t%%d_t%%d.dat", ens_name, jackknife_num);
+    sprintf(true_corr_file_format, "../Qslice_to_correlation/%s/correlations_jackknife%d_t%%d_t%%d.dat", ens_name, jackknife_num);
     read_true_correlations(true_corr_file_format, T);
   } else {
     //mexPrintf("Correlations are already loaded for ensemble %s\n", ens_name);
