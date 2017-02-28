@@ -4,6 +4,8 @@
 #include <cstdlib>
 #include <cstring>
 
+#include <sys/stat.h>
+
 char* ens_name;
 int T;
 int N;
@@ -128,6 +130,11 @@ std::vector<std::vector<double> > compute_errors_periodic(const std::vector<std:
 
 void write_correlations_periodic(std::vector<std::vector<double> > correlations, 
                                  std::vector<std::vector<double> > correlation_errors) {
+// Jiqun Tu  
+  char filestem[256];
+  sprintf(filestem, "./%s", ens_name);
+  mkdir(filestem, 0777);
+
   for(int dt = 0; dt < T; dt++) {
     char filename[256];
     sprintf(filename, "./%s/correlations_jackknife%d_dt%d.dat", ens_name, jackknife_num, dt);
@@ -246,6 +253,12 @@ std::vector<std::vector<std::vector<double> > > compute_errors_open(const std::v
 
 void write_correlations_open(std::vector<std::vector<std::vector<double> > > correlations,
                              std::vector<std::vector<std::vector<double> > > correlation_errors) {
+  
+// Jiqun Tu  
+  char filestem[256];
+  sprintf(filestem, "./%s", ens_name);
+  mkdir(filestem, 0777);
+
   for(int t1 = 0; t1 < T; t1++) {
     //printf("t1 = %d\n", t1);
     for(int t2 = 0; t2 < T; t2++) {
