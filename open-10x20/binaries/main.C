@@ -59,6 +59,8 @@ const int wflow_nsteps = 30;
 const int wflow_measure_start_step = 0;
 const int wflow_measure_interval = 1;
 
+// Jiqun
+const int total_number_of_traj = 110000;
 
 void setup(int *argc, char **argv[]);
 void do_all_measurements(int traj);
@@ -103,6 +105,9 @@ int main(int argc, char *argv[])
     
     if((traj % wflow_trajs_per_measurement) == 0) {
       checkpoint(traj);
+	  if(traj > total_number_of_traj){
+	  	break;
+	  }
     }
   }
 
