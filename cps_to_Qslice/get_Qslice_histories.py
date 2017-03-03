@@ -5,13 +5,13 @@ import sys
 import time
 import math
 
-# argument format: --open/periodic #ens_name #therm_trajs
-# e.x., ./get_Qslices_history --open open-10x20 300
+# argument format: --open/periodic #ens_name #therm_trajs #wflow_dir
+# e.x., ./get_Qslices_history --open open-10x20 300 dir/to/wflow
 
-assert len(sys.argv) == 4
+if len(sys.argv) != 5: raise Exception('need 4 arguments but %d are given.' % len(sys.argv))
 if sys.argv[1] == '--periodic': bc_open = False
 elif sys.argv[1] == '--open': bc_open = True
-else: raise Exception('Unknown command line option %s' % sys.argv[1])
+else: raise Exception('unknown command line option %s' % sys.argv[1])
 
 ens_name = sys.argv[2]
 print "ens_name =", ens_name
@@ -20,6 +20,9 @@ print "ens_name =", ens_name
 therm_trajs = int(sys.argv[3])
 
 print "Skipping first %d trajectories" % therm_trajs
+
+folder = sys.argv[4]
+print "reading from %s" % folder
 
 # Jiqun Tu
 if not os.path.exists('%s' % ens_name):
@@ -81,7 +84,7 @@ def file_age(filename):
   return now - os.path.getmtime(filename)
 
 print "Counting results files..."
-folder = '/home/gregm/DBW2/%s/results/alg_wflow' % ens_name
+# folder = '/home/gregm/DBW2/%s/results/alg_wflow' % ens_name
 confs = [int(f[6:]) for f in os.listdir(folder) if f[:6] == 'wflow.' and file_age(folder + '/' + f) > 300]
 confs = [x for x in confs if x >= therm_trajs] #skip thermalization
 confs.sort()
