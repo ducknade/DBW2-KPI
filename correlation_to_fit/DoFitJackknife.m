@@ -1,4 +1,4 @@
-function DoFitJackknife
+function DoFitJackknife(tau_guess, D_guess, ens_name, bc_name, T, Njack)
 
   %TODO: generalize to non-16x32
 
@@ -59,10 +59,22 @@ function DoFitJackknife
 %  [central_params, param_errors, chisq, chisq_error] = RunEnsemble('open-8x16', 16, 'open', Njack, guess_params);
 %  WriteOpenResults('open-8x16', 16, central_params, param_errors, chisq, chisq_error);
 
-  guess_params = [55, repmat(0.115, 1, 10)];
-  Njack = 121;
-  [central_params, param_errors, chisq, chisq_error] = RunEnsemble('open-10x20', 20, 'open', Njack, guess_params);
-  WriteOpenResults('open-10x20', 20, central_params, param_errors, chisq, chisq_error);
+
+%%% Jiqun Tu
+	guess_params = [tau_guess, repmat(D_guess, 1, T/2)];
+	[central_params, param_errors, chisq, chisq_error] = RunEnsemble(ens_name, T, bc_name, Njack, guess_params);
+	if bc_name == 'open'
+		WriteOpenResults(ens_name, T, central_params, param_errors, chisq, chisq_error);
+	else bc_name == 'periodic'
+		WriteOpenResults(ens_name, T, central_params, param_errors, chisq, chisq_error);
+	end
+%%% Jiqun Tu		
+	
+
+%  guess_params = [55, repmat(0.115, 1, 10)];
+%  Njack = 121;
+%  [central_params, param_errors, chisq, chisq_error] = RunEnsemble('open-10x20', 20, 'open', Njack, guess_params);
+%  WriteOpenResults('open-10x20', 20, central_params, param_errors, chisq, chisq_error);
 
 %  guess_params = [200, repmat(0.115, 1, 12)];
 %  Njack = 51;
