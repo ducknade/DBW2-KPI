@@ -84,6 +84,9 @@ int main(int argc, char *argv[])
 
 // added by Jiqun Tu
   mkdir("../results", 0777);
+  mkdir("../results/alg_hmc", 0777);
+  mkdir("../results/alg_plaq", 0777);
+  mkdir("../results/alg_wflow", 0777);
   mkdir("../work", 0777);
   mkdir("../rngs", 0777);
   mkdir("../configurations", 0777);

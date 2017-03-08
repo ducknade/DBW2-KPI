@@ -6,7 +6,7 @@
 bc_name="open"
 
 # ensemble name
-ens_name="open-8x16"
+ens_name="open-10x20"
 
 # directory of the wilson flow files
 ens_dir="/home/gregm/DBW2/open-8x16/results/alg_wflow"
@@ -15,13 +15,13 @@ ens_dir="/home/gregm/DBW2/open-8x16/results/alg_wflow"
 num_thermal="10000"
 
 # time extent size
-T="16"
+T="20"
 
 # MD spacing between two consecutive measurements
-meas_spacing_MD="10"
+meas_spacing_MD="15"
 
 # block size in MD unit
-block_size_MD="400"
+block_size_MD="1200"
 
 # do NOT change if you don't understand what is this 
 max_MD_sep=$[$block_size_MD/2]
@@ -35,9 +35,9 @@ err_max_MD_sep=$[$block_size_MD/4]
 num_reps="1"
 
 # list of replicas
-rep_names="open-8x16"
+rep_names="open-10x20"
 
 # initial values of the parameters for the fit
-tau_guess="18"
+tau_guess="55"
 D_guess="0.115"
 
