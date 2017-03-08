@@ -2,11 +2,16 @@
 
 #input deck for the analysis of the KPI-DBW2.
 
+# boundary condition
 bc_name="open"
+
+# ensemble name
 ens_name="open-8x16"
+
+# directory of the wilson flow files
 ens_dir="/home/gregm/DBW2/open-8x16/results/alg_wflow"
 
-#
+# number of thermalization steps, i.e. skip these configurations
 num_thermal="10000"
 
 # time extent size
@@ -18,11 +23,11 @@ meas_spacing_MD="10"
 # block size in MD unit
 block_size_MD="400"
 
-# 
+# do NOT change if you don't understand what is this 
 max_MD_sep=$[$block_size_MD/2]
 #echo $max_MD_sep
 
-#
+# do NOT change if you don't understand what is this 
 err_max_MD_sep=$[$block_size_MD/4]
 #echo $err_max_MD_sep
 
@@ -32,6 +37,7 @@ num_reps="1"
 # list of replicas
 rep_names="open-8x16"
 
+# initial values of the parameters for the fit
 tau_guess="18"
 D_guess="0.115"
 
