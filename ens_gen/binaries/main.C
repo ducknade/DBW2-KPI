@@ -18,6 +18,7 @@
 #include <fenv.h>
 
 #include <unistd.h>
+#include <sys/stat.h>
 
 USING_NAMESPACE_CPS
 
@@ -80,6 +81,12 @@ int main(int argc, char *argv[])
   const char* fname = "main()";
 
   setup(&argc, &argv);
+
+// added by Jiqun Tu
+  mkdir("../results", 0777);
+  mkdir("../work", 0777);
+  mkdir("../rngs", 0777);
+  mkdir("../configurations", 0777);
 
   GJP.TopenBc(true); //Use open boundary conditions
   if(GJP.TopenBc()) {
