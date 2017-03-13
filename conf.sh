@@ -9,7 +9,7 @@ bc_name="open"
 ens_name="open-10x20"
 
 # directory of the wilson flow files
-ens_dir="/home/gregm/DBW2/open-8x16/results/alg_wflow"
+ens_dir="/home/gregm/DBW2/open-10x20/results/alg_wflow"
 
 # number of thermalization steps, i.e. skip these configurations
 num_thermal="10000"
