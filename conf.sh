@@ -23,11 +23,11 @@ meas_spacing_MD="15"
 # block size in MD unit
 block_size_MD="1200"
 
-# do NOT change if you don't understand what is this 
+# the maximum MD separation when computing correlations
 max_MD_sep=$[$block_size_MD/2]
 #echo $max_MD_sep
 
-# do NOT change if you don't understand what is this 
+# the maximum MD separation when computing error of the correlations
 err_max_MD_sep=$[$block_size_MD/4]
 #echo $err_max_MD_sep
 

@@ -117,7 +117,7 @@ std::vector<std::vector<double> > compute_errors_periodic(const std::vector<std:
             }
           }
         }
-        err /= 2*N*T*num_replicas;
+        err /= 2*N*T*num_replicas; // there is a 2 because k is double counted?
         err = std::sqrt(err);
         err_dt.push_back(err);
       }
