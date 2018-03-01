@@ -63,11 +63,11 @@ function DoFitJackknife(tau_guess, D_guess, ens_name, bc_name, T, Njack)
 %%% Jiqun Tu
 	guess_params = [tau_guess, repmat(D_guess, 1, T/2)];
 	[central_params, param_errors, chisq, chisq_error] = RunEnsemble(ens_name, T, bc_name, Njack, guess_params);
-	if bc_name == 'open'
-		WriteOpenResults(ens_name, T, central_params, param_errors, chisq, chisq_error);
-	else bc_name == 'periodic'
-		WriteOpenResults(ens_name, T, central_params, param_errors, chisq, chisq_error);
-	end
+%	if bc_name == 'open'
+%		WriteOpenResults(ens_name, T, central_params, param_errors, chisq, chisq_error);
+%	else bc_name == 'periodic'
+		WritePeriodicResults(ens_name, T, central_params, param_errors, chisq, chisq_error);
+%	end
 %%% Jiqun Tu		
 	
 

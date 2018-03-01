@@ -85,7 +85,7 @@ def file_age(filename):
 
 print "Counting results files..."
 # folder = '/home/gregm/DBW2/%s/results/alg_wflow' % ens_name
-confs = [int(f[6:]) for f in os.listdir(folder) if f[:6] == 'wflow.' and file_age(folder + '/' + f) > 300]
+confs = [int(f[6:]) for f in os.listdir(folder) if f[:6] == 'wflow.' and file_age(folder + '/' + f) > 60]
 confs = [x for x in confs if x >= therm_trajs] #skip thermalization
 confs.sort()
 

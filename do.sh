@@ -16,7 +16,7 @@ dir_3=$(pwd)"/correlation_to_fit"
 
 # execute step 1
 cd $dir_1
-./get_Qslice_histories.py "--"$bc_name $ens_name $num_thermal $(readlink -f $ens_dir)
+./get_Qslice_histories.py "--"$bc_name $ens_name $num_thermal $ens_dir
 
 # execute step 2
 cd $dir_2
@@ -27,5 +27,5 @@ rm tmp.crap
 
 # execute step 3
 cd $dir_3
-matlab -r "DoFitJackknife($tau_guess, $D_guess, '$ens_name', '$bc_name', $T, $[$Njack+1]); quit;"
+matlab -nodesktop -r "DoFitJackknife($tau_guess, $D_guess, '$ens_name', '$bc_name', $T, $[$Njack+1]); quit;"
 
