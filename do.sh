@@ -29,3 +29,4 @@ rm tmp.crap
 cd $dir_3
 matlab -nodesktop -r "DoFitJackknife($tau_guess, $D_guess, '$ens_name', '$bc_name', $T, $[$Njack+1]); quit;"
 
+cat $dir_3/results/$ens_name*

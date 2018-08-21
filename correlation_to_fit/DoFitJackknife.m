@@ -109,6 +109,9 @@ function [central_params, param_errors, chisq, chisq_error] = RunEnsemble(ens_na
     error('Bad bc input: %s', bc);
   end
 
+	lb = [250.0, repmat(0., 1, T/2)];
+	ub = [250.1, repmat(1., 1, T/2)];
+  
   jackknife_params = [];
   jackknife_chisq = [];
   for jack = 0:Njack-1
