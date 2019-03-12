@@ -8,7 +8,7 @@ import math
 # argument format: --open/periodic #ens_name #therm_trajs #wflow_dir
 # e.x., ./get_Qslices_history --open open-10x20 300 dir/to/wflow
 
-if len(sys.argv) != 5: raise Exception('need 4 arguments but %d are given.' % len(sys.argv))
+if len(sys.argv) < 5: raise Exception('need at least 4 arguments but %d are given. Usage:\n./get_Qslices_history --<open/periodic> <ens-name> <num-thermal> <ens-dir>' % len(sys.argv))
 if sys.argv[1] == '--periodic': bc_open = False
 elif sys.argv[1] == '--open': bc_open = True
 else: raise Exception('unknown command line option %s' % sys.argv[1])
@@ -23,6 +23,16 @@ print "Skipping first %d trajectories" % therm_trajs
 
 folder = sys.argv[4]
 print "reading from %s" % folder
+
+# The wilson flow reference SCALE
+wfs_ref_min = 0.3
+wfs_ref_max = 0.3
+wfs_ref_add = 0.0
+if len(sys.argv) == 8:
+  wfs_ref_min = float(sys.argv[5])
+  wfs_ref_max = float(sys.argv[6])
+  wfs_ref_add = float(sys.argv[7])
+
 
 # Jiqun Tu
 if not os.path.exists('%s' % ens_name):
@@ -58,7 +68,7 @@ def read_results(filename):
     Es.append(E)
     sliceE = [float(x) for x in lines[i+1].split()]
     sliceEs.append(sliceE)
-
+    
     Q_11 = float(lines[i+9].split()[3])
     Q_12 = float(lines[i+10].split()[3])
     Q_22 = float(lines[i+11].split()[3])
@@ -85,7 +95,7 @@ def file_age(filename):
 
 print "Counting results files..."
 # folder = '/home/gregm/DBW2/%s/results/alg_wflow' % ens_name
-confs = [int(f[6:]) for f in os.listdir(folder) if f[:6] == 'wflow.' and file_age(folder + '/' + f) > 60]
+confs = [int(f[6:]) for f in os.listdir(folder) if f[:6] == 'wflow.' and file_age(folder + '/' + f) > 00]
 confs = [x for x in confs if x >= therm_trajs] #skip thermalization
 confs.sort()
 
@@ -94,7 +104,11 @@ if len(confs) == 0:
   exit()
 
 dconf = confs[1] - confs[0] #separation in configurations between adjacent measurements
-assert all([confs[i+1] - confs[i] == dconf for i in range(len(confs)-1)])
+#assert all([confs[i+1] - confs[i] == dconf for i in range(len(confs)-1)])
+for i in range(len(confs)-1):
+  if confs[i+1] - confs[i] != dconf:
+    print "%d -> %d" %(confs[i+1], confs[i])
+    exit(1) 
 
 print "%d results files from %d configurations" % (len(confs), max(confs))
 
@@ -104,49 +118,94 @@ print "Read results files"
 
 all_wfts, all_Es, all_sliceEs, all_Qs, all_sliceQs = zip(*all_results)
 
-wfts = all_wfts[0] #The wilson flow times at which measurements have been made
 Nt = len(all_sliceEs[0][0]) #number of time slices
 T = Nt
 L = Nt/2
 ts = [i for i in range(Nt)]
 
-Ehists = dict(zip(wfts, zip(*all_Es))) #Ehists[t] is the history of E measurements at flow time t
-Qhists = dict(zip(wfts, zip(*all_Qs))) #Qhists[t] is the history of Q measurements of flow time Q
-
-sliceEhists = {} #sliceEhists[wft][t][c] is the E measured at wilson flow time wft on slice t on conf c
-sliceQhists = {} #sliceQhists[wft][t][c] is the Q measured at wilson flow time wft on slice t on conf c
-for w in range(len(wfts)):
-  sliceEhists[wfts[w]] = [[all_sliceEs[c][w][t] for c in range(len(confs))] for t in range(Nt)]
-  sliceQhists[wfts[w]] = [[all_sliceQs[c][w][t] for c in range(len(confs))] for t in range(Nt)]
-
-def get_central_Qhist(wft, nslices): 
-  tmin = Nt/2 - nslices/2
-  tmax = nslices + tmin
-  return analyze.list_sum(sliceQhists[wft][tmin:tmax])
-
-def get_central_Ehist(wft, nslices): 
-  tmin = Nt/2 - nslices/2
-  tmax = nslices + tmin
-  return analyze.list_mean(sliceEhists[wft][tmin:tmax])
-
-#Compute the reference flow times t0 and w0
-W = Nt/4 if bc_open else 0
-mean_Es = [analyze.mean(get_central_Ehist(wft, Nt-2*W)) for wft in wfts]
-t0 = analyze.flow_scale_luscher(wfts, mean_Es)
-w0 = analyze.flow_scale_BMW(wfts, mean_Es)
-
-#Pick a reference Wilson flow time, and interpolate Q and E measurements to that
-#flow time
-wft_ref = t0**2 #TODO: consider switching to w0**2
-(wft_1, wft_2) = next((wfts[i], wfts[i+1]) for i in range(len(wfts)-1) if wfts[i+1] > wft_ref)
-interp = (wft_ref - wft_1)/(wft_2 - wft_1)
 def interpolate_lists(interp, data1, data2):
   return [(1-interp)*x1 + interp*x2 for (x1, x2) in zip(data1, data2)]
-Ehist_ref = interpolate_lists(interp, Ehists[wft_1], Ehists[wft_2])
-Qhist_ref = interpolate_lists(interp, Qhists[wft_1], Qhists[wft_2])
-sliceEhists_ref = [interpolate_lists(interp, sliceEhists[wft_1][t], sliceEhists[wft_2][t]) for t in range(Nt)]
-sliceQhists_ref = [interpolate_lists(interp, sliceQhists[wft_1][t], sliceQhists[wft_2][t]) for t in range(Nt)]
 
-for t in ts:
-  print "Writing history file for slice %d" % t
-  analyze.write_gnuplot_file('%s/Qslice_%d.dat' % (ens_name, t), [sliceQhists_ref[t]])
+def interpolate_numbers(interp, x1, x2):
+  return (1-interp)*x1 + interp*x2
+
+wfs_ref = wfs_ref_min
+while wfs_ref < wfs_ref_max + 0.01:
+  #for wfs_ref in range(wfs_ref_min, wfs_ref_max, wfs_ref_add):
+  print "Wilson flow reference scale = %6.4f" % wfs_ref
+
+  sliceQhists_ref = []
+  Qhists_ref = []
+  # Now every configuration has different wilson flow time so need to treat each configuration individually
+  for c in range(len(confs)):
+    # print all_wfts[c]
+    # print all_Es[c]
+    # mean_Es = [analyze.mean(get_central_Ehist(wft, Nt-2*W)) for wft in wfts]
+    wfts = all_wfts[c]
+    print "Parsing configuration #%05d ..." %confs[c]
+    t0 = analyze.flow_scale_luscher(wfts, all_Es[c], wfs_ref)
+    wft_ref = t0**2
+  
+    (wft_1, wft_2) = next((wfts[i], wfts[i+1]) for i in range(len(wfts)-1) if wfts[i+1] > wft_ref)
+    interp = (wft_ref - wft_1)/(wft_2 - wft_1)
+  
+    sliceQhists = {} #sliceQhists[wft][t][c] is the Q measured at wilson flow time wft on slice t on conf c
+    Qhists = {}
+    for w in range(len(wfts)):
+      Qhists[wfts[w]] = all_Qs[c][w]
+      sliceQhists[wfts[w]] = [all_sliceQs[c][w][t] for t in ts]
+    
+    Qhists_ref.append( interpolate_numbers(interp, Qhists[wft_1], Qhists[wft_2]) )
+    sliceQhists_ref.append( [interpolate_numbers(interp, sliceQhists[wft_1][t], sliceQhists[wft_2][t]) for t in ts] )
+    
+    # print("%05d %6.4f %6.4f" %(c, t0, Qhists_ref[c]))
+  
+  sliceQhists_output = [[sliceQhists_ref[c][t] for c in range(len(confs))] for t in ts]
+  # wfts = all_wfts[0] #The wilson flow times at which measurements have been made
+  
+  # Ehists = dict(zip(wfts, zip(*all_Es))) #Ehists[t] is the history of E measurements at flow time t
+  # Qhists = dict(zip(wfts, zip(*all_Qs))) #Qhists[t] is the history of Q measurements of flow time Q
+  # 
+  # sliceEhists = {} #sliceEhists[wft][t][c] is the E measured at wilson flow time wft on slice t on conf c
+  # sliceQhists = {} #sliceQhists[wft][t][c] is the Q measured at wilson flow time wft on slice t on conf c
+  # for w in range(len(wfts)):
+  #   sliceEhists[wfts[w]] = [[all_sliceEs[c][w][t] for c in range(len(confs))] for t in range(Nt)]
+  #   sliceQhists[wfts[w]] = [[all_sliceQs[c][w][t] for c in range(len(confs))] for t in range(Nt)]
+  # 
+  # def get_central_Qhist(wft, nslices): 
+  #   tmin = Nt/2 - nslices/2
+  #   tmax = nslices + tmin
+  #   return analyze.list_sum(sliceQhists[wft][tmin:tmax])
+  # 
+  # def get_central_Ehist(wft, nslices): 
+  #   tmin = Nt/2 - nslices/2
+  #   tmax = nslices + tmin
+  #   return analyze.list_mean(sliceEhists[wft][tmin:tmax])
+  # 
+  # #Compute the reference flow times t0 and w0
+  # W = Nt/4 if bc_open else 0
+  # mean_Es = [analyze.mean(get_central_Ehist(wft, Nt-2*W)) for wft in wfts]
+  # t0 = analyze.flow_scale_luscher(wfts, mean_Es, 0.3)
+  # w0 = analyze.flow_scale_BMW(wfts, mean_Es, 0.3)
+  # 
+  # #Pick a reference Wilson flow time, and interpolate Q and E measurements to that
+  # #flow time
+  # wft_ref = t0**2 #TODO: consider switching to w0**2
+  # (wft_1, wft_2) = next((wfts[i], wfts[i+1]) for i in range(len(wfts)-1) if wfts[i+1] > wft_ref)
+  # interp = (wft_ref - wft_1)/(wft_2 - wft_1)
+  # # def interpolate_lists(interp, data1, data2):
+  # #   return [(1-interp)*x1 + interp*x2 for (x1, x2) in zip(data1, data2)]
+  # Ehist_ref = interpolate_lists(interp, Ehists[wft_1], Ehists[wft_2])
+  # Qhist_ref = interpolate_lists(interp, Qhists[wft_1], Qhists[wft_2])
+  # sliceEhists_ref = [interpolate_lists(interp, sliceEhists[wft_1][t], sliceEhists[wft_2][t]) for t in range(Nt)]
+  # sliceQhists_ref = [interpolate_lists(interp, sliceQhists[wft_1][t], sliceQhists[wft_2][t]) for t in range(Nt)]
+ 
+  dir_path = '%s_wfs%.4f' % (ens_name, wfs_ref)
+  if not os.path.exists(dir_path): os.mkdir(dir_path)
+  print "Writing GLOBAL history file"
+  analyze.write_gnuplot_file('%s/Q.dat' % (dir_path), [Qhists_ref])
+  for t in ts:
+    print "Writing history file for slice %d" % t
+    analyze.write_gnuplot_file('%s/Qslice_%d.dat' % (dir_path, t), [sliceQhists_output[t]])
+
+  wfs_ref += wfs_ref_add

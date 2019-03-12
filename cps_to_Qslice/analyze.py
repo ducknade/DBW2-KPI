@@ -554,7 +554,9 @@ def format_error(value, error):
 #Result is a physical length scale in expressed in units of a
 def flow_scale_luscher(t, E, threshold = 0.3):
   t2E = [t[i]**2 * E[i] for i in range(len(t))]
+  # print t2E
   if max(t2E) < threshold:
+    print "max(t2E) = %.6f < threshold = %.6f" %(max(t2E), threshold)
     raise Exception("Didn't flow long enough!")
     #(lower_i, upper_i) = (len(t)-2, len(t)-1)
   else:

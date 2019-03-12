@@ -41,3 +41,7 @@ rep_names="open-10x20"
 tau_guess="55"
 D_guess="0.115"
 
+wfs_ref_min="0.0"
+wfs_ref_max="0.25"
+wfs_ref_add="0.05"
+
