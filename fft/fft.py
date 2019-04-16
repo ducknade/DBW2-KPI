@@ -144,10 +144,10 @@ def generate_gnuplot_script(ens, dt, num_col, diff=False):
     print("", file=f)
     if diff:
       print("set label 1 at graph 0.1, graph 0.9 '\\texttt{%s diff.}' " %ens.replace("_","\\_"), file=f)
-      print("infile = '%s_difference.dat'" %ens, file=f)
+      print("infile = 'data/%s_difference.dat'" %ens, file=f)
     else:
       print("set label 1 at graph 0.1, graph 0.9 '\\texttt{%s value}' " %ens.replace("_","\\_"), file=f)
-      print("infile = '%s_adaptive.dat'" %ens, file=f)
+      print("infile = 'data/%s_adaptive.dat'" %ens, file=f)
     print("", file=f)
     print("plot for [i=1:%d:1] infile using (2-2*cos($1*two_pi)+0.04*i):(column(2*i)):(column(2*i+1)) with ye lw 1.5 pt 7 title columnheader(i*2), \\" %num_col, file=f)
     print("", file=f)
@@ -297,11 +297,11 @@ print("T = %d" % ens_t)
 ens_dtau = int(sys.argv[4])
 print("dtau = %d" % ens_dtau)
 
-num_col = compute_ens_wfs(ens_stem, njack, ens_t, 5, ens_dtau, 0, 6, "%s_adaptive.dat"%ens_stem, False)
+num_col = compute_ens_wfs(ens_stem, njack, ens_t, 5, ens_dtau, 0, 6, "data/%s_adaptive.dat"%ens_stem, False)
 generate_gnuplot_script(ens_stem, ens_dtau, num_col, False)
 os.system("gnuplot -c plots/"+ ens_stem +"_adaptive.gnuplot")
 
-compute_ens_wfs(ens_stem, njack, ens_t, 5, ens_dtau, 0, 6, "%s_difference.dat"%ens_stem, True)
+compute_ens_wfs(ens_stem, njack, ens_t, 5, ens_dtau, 0, 6, "data/%s_difference.dat"%ens_stem, True)
 generate_gnuplot_script(ens_stem, ens_dtau, num_col, True)
 os.system("gnuplot -c plots/"+ ens_stem +"_difference.gnuplot")
 
